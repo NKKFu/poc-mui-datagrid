@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "homepage": "https://nkkfu.github.io/poc-mui-datagrid",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
