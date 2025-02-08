@@ -1,4 +1,4 @@
-import { Route, Routes, BrowserRouter } from 'react-router-dom';
+import { Route, Routes, HashRouter } from 'react-router-dom';
 import { queryClient } from './configs/query.config';
 import { GlobalStyles } from './configs/styled.config';
 import { Contexts } from './contexts';
@@ -10,12 +10,12 @@ export const App = () => {
     return <Contexts>
         <GlobalStyles />
         <QueryClientProvider client={queryClient}>
-            <BrowserRouter>
+            <HashRouter>
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/delete-posts" element={<DeletePosts />} />
                 </Routes>
-            </BrowserRouter>
+            </HashRouter>
         </QueryClientProvider>
     </Contexts >
 }
