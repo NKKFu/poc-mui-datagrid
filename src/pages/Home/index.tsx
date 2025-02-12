@@ -1,91 +1,87 @@
 import {
-	DataGridPremium,
-	GridColDef,
-	GridRowId,
-	GridToolbarContainer,
-	GridToolbarDensitySelector,
-	useGridApiRef
+    DataGridPremium,
+    GridColDef,
+    GridRowId,
+    GridToolbarContainer,
+    useGridApiRef
 } from "@mui/x-data-grid-premium"
 import { useListPosts } from "../../hooks/queries/useListPosts";
 import { Post } from "../../models/post";
-import { Container, Footer } from "./styles";
+import { Container } from "./styles";
 import { Button } from "@mui/material";
-import { useContext } from "react";
+import React, { useContext } from "react";
 import { RowsSelectedContext } from "../../contexts/rowsSelectedContext";
 import { useNavigate } from "react-router-dom";
 import { queryClient } from "../../configs/query.config";
 import { renderInputfield } from "../../components/InputfieldRender";
+import { RefetchButton } from "../../components/RefetchButtonRender";
+import { CustomFooter } from "../../components/CustomFooter";
+
 
 export const Home = () => {
-	const {
-		queryKey: postsQueryKey,
-		query: postsQuery
-	} = useListPosts();
-	const navigate = useNavigate();
-	const apiRef = useGridApiRef();
+    const {
+        queryKey: listPostsQueryKey,
+        query: listPostsQuery,
+    } = useListPosts();
 
-	const { postIdsSelected, setPostIdsSelected } = useContext(RowsSelectedContext);
+    const navigate = useNavigate();
+    const apiRef = useGridApiRef();
 
-	function handleUpdateRow(rows: React.SetStateAction<Post[]>) {
-		queryClient.setQueryData(postsQueryKey, rows as Post[]);
-	}
+    const { postIdsSelected, setPostIdsSelected } = useContext(RowsSelectedContext);
 
-	const columns = [
-		{
-			field: 'userId',
-			type: 'number',
-		},
-		{
-			field: 'id',
-			type: 'number',
-		},
-		{
-			field: 'title',
-			type: 'string',
-		},
-		{
-			field: 'body',
-			type: 'string',
-			flex: 1,
-			renderCell: renderInputfield(handleUpdateRow),
-		},
-	] as GridColDef<Post>[];
+    function handleUpdateRow(rows: React.SetStateAction<Post[]>) {
+        queryClient.setQueryData(listPostsQueryKey, rows as Post[]);
+    }
 
-	return <Container>
-		<DataGridPremium
-			slots={{
-				toolbar: () => <GridToolbarContainer>
-					<Button
-						variant="text"
-						color="primary"
-						onClick={() => postsQuery.refetch()}
-					>
-						Refetch
-					</Button>
-					<GridToolbarDensitySelector />
-				</GridToolbarContainer>
-			}}
-			checkboxSelection
-			columns={columns}
-			rows={postsQuery.data || []}
-			loading={postsQuery.isFetching}
-			apiRef={apiRef}
-			onRowSelectionModelChange={newSelection => setPostIdsSelected(newSelection as GridRowId[])}
-			rowSelectionModel={postIdsSelected}
-			disableRowSelectionOnClick
-		/>
+    const columns = [
+        {
+            field: 'userId',
+            type: 'number',
+        },
+        {
+            field: 'id',
+            type: 'number',
+        },
+        {
+            field: 'title',
+            type: 'string',
+        },
+        {
+            field: 'body',
+            type: 'string',
+            flex: 1,
+            renderCell: renderInputfield(handleUpdateRow),
+        },
+    ] as GridColDef<Post>[];
 
-		<Footer>
-			<Button
-				variant="contained"
-				color="success"
-				disabled={postIdsSelected.length <= 0}
-				onClick={() => {
-					navigate('/delete-posts');
-				}}
-			>
-				Next
-			</Button>
-		</Footer>
-	</Container>
+    return <Container>
+        <DataGridPremium
+            slots={{
+                toolbar: () => <GridToolbarContainer>
+                    <RefetchButton query={listPostsQuery} />
+                </GridToolbarContainer>,
+                footer: (props) => <CustomFooter {...props}>
+                    <Button
+                        variant="contained"
+                        color="success"
+                        disabled={postIdsSelected.length <= 0}
+                        onClick={() => {
+                            navigate('/delete-posts');
+                        }}
+                    >
+                        Next
+                    </Button>
+                </CustomFooter>,
+            }}
+            checkboxSelection
+            columns={columns}
+            rows={listPostsQuery.data || []}
+            loading={listPostsQuery.isFetching}
+            apiRef={apiRef}
+            onRowSelectionModelChange={newSelection => setPostIdsSelected(newSelection as GridRowId[])}
+            rowSelectionModel={postIdsSelected}
+            disableRowSelectionOnClick
+            density="compact"
+        />
+    </Container>
 }
